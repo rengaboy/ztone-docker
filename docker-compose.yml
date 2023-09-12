@@ -1,7 +1,7 @@
 version: '3'
 services:
   zerotier:
-    image: rengaboy/ztone-docker
+    image: rengaboy/zerotier
     container_name: zerotier-one
     devices:
       - /dev/net/tun
