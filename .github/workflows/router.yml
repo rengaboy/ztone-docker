@@ -9,8 +9,6 @@ on:
         required: true
         type: string
     secrets:
-      QUAY_PASSWORD:
-        required: true
       REGISTRY_PASSWORD:
         required: true
 
@@ -100,7 +98,6 @@ jobs:
         if: ${{ inputs.event == 'push' }}
         run: |
           buildah manifest push --all --format v2s2 --creds rengaboy:${{ secrets.REGISTRY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/rengaboy/${{ env.IMAGE_NAME }}:router-main
-          buildah manifest push --all --creds rengaboy:${{ secrets.QUAY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://quay.io/rengaboy/${{ env.IMAGE_NAME }}:router-main
           buildah manifest push --all --creds rengaboy:${{ secrets.GITHUB_TOKEN }} ${{ env.IMAGE_NAME }}:latest docker://ghcr.io/rengaboy/${{ env.IMAGE_NAME }}:router-main
 
       - name: Push stable images
@@ -108,7 +105,5 @@ jobs:
         run: |
           buildah manifest push --all --format v2s2 --creds rengaboy:${{ secrets.REGISTRY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/rengaboy/${{ env.IMAGE_NAME }}:router
           buildah manifest push --all --format v2s2 --creds rengaboy:${{ secrets.REGISTRY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/rengaboy/${{ env.IMAGE_NAME }}:router-${{ github.event.release.tag_name }}
-          buildah manifest push --all --creds rengaboy:${{ secrets.QUAY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://quay.io/rengaboy/${{ env.IMAGE_NAME }}:router
-          buildah manifest push --all --creds rengaboy:${{ secrets.QUAY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://quay.io/rengaboy/${{ env.IMAGE_NAME }}:router-${{ github.event.release.tag_name }}
           buildah manifest push --all --creds rengaboy:${{ secrets.GITHUB_TOKEN }} ${{ env.IMAGE_NAME }}:latest docker://ghcr.io/rengaboy/${{ env.IMAGE_NAME }}:router
           buildah manifest push --all --creds rengaboy:${{ secrets.GITHUB_TOKEN }} ${{ env.IMAGE_NAME }}:latest docker://ghcr.io/rengaboy/${{ env.IMAGE_NAME }}:router-${{ github.event.release.tag_name }}
