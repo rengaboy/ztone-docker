@@ -30,7 +30,7 @@ jobs:
           {name: "linux/riscv64", tag: "riscv64"}
         ]
     steps:
-      - name: Checkout zerotier-docker
+      - name: Checkout ztone-docker
         uses: actions/checkout@v3
 
       - name: Install qemu dependency
@@ -90,11 +90,22 @@ jobs:
       - name: Push unstable images
         if: ${{ github.event_name == 'push' }}
         run: |
+          buildah manifest push --all --format v2s2 --creds rengaboy:${{ secrets.REGISTRY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/rengaboy/${{ env.IMAGE_NAME }}:main
           buildah manifest push --all --creds rengaboy:${{ secrets.GITHUB_TOKEN }} ${{ env.IMAGE_NAME }}:latest docker://ghcr.io/rengaboy/${{ env.IMAGE_NAME }}:main
 
       - name: Push stable images
         if: ${{ github.event_name == 'release' }}
         run: |
+          buildah manifest push --all --format v2s2 --creds rengaboy:${{ secrets.REGISTRY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/rengaboy/${{ env.IMAGE_NAME }}:latest
+          buildah manifest push --all --format v2s2 --creds rengaboy:${{ secrets.REGISTRY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/rengaboy/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
           buildah manifest push --all --creds rengaboy:${{ secrets.GITHUB_TOKEN }} ${{ env.IMAGE_NAME }}:latest docker://ghcr.io/rengaboy/${{ env.IMAGE_NAME }}:latest
           buildah manifest push --all --creds rengaboy:${{ secrets.GITHUB_TOKEN }} ${{ env.IMAGE_NAME }}:latest docker://ghcr.io/rengaboy/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
 
+  router:
+    uses: ./.github/workflows/router.yml
+    needs: push
+    with:
+      tag: ${{ github.event.release.tag_name }}
+      event: ${{ github.event_name }}
+    secrets:
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
